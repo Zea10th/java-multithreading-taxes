@@ -1,32 +1,36 @@
 package org.example;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.Callable;
 
-public class Market implements Runnable {
-    public final static int VALUES = 10;
-    public final static int BANK_NOTE_TYPE = 100;
+public class Market implements Callable<String> {
+    public static final int VALUES = 10;
+    public static final int BANK_NOTE_TYPE = 100;
+    private final TaxBase taxBase;
     private List<Integer> transactions;
-    private TaxBase taxBase;
 
     public Market(TaxBase taxBase) {
-        this.transactions = new ArrayList();
+        this.transactions = new ArrayList<>();
         this.taxBase = taxBase;
     }
 
     public void addTransaction() {
-        this.transactions.add(BANK_NOTE_TYPE * (int) (Math.random() * VALUES));
+        this.transactions.add(BANK_NOTE_TYPE * (new Random().nextInt(VALUES) + VALUES));
     }
 
     @Override
-    public void run() {
+    public String call() throws Exception {
         System.out.println("Calculating of market " + Thread.currentThread().getName() + " get started.");
         for (int i = 0; i < VALUES; i++) {
             addTransaction();
         }
 
-        taxBase.addTaxBase(Thread.currentThread().getName(), this.transactions);
-
         System.out.println("Calculating of market " + Thread.currentThread().getName() + " finished.");
+
+        taxBase.addTaxBase(Thread.currentThread().getName(), transactions);
+
+        return Thread.currentThread().getName();
     }
 }
