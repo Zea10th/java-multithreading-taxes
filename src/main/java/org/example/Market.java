@@ -9,7 +9,7 @@ public class Market implements Callable<String> {
     public static final int VALUES = 10;
     public static final int BANK_NOTE_TYPE = 100;
     private final TaxBase taxBase;
-    private List<Integer> transactions;
+    private List<Long> transactions;
 
     public Market(TaxBase taxBase) {
         this.transactions = new ArrayList<>();
@@ -17,7 +17,7 @@ public class Market implements Callable<String> {
     }
 
     public void addTransaction() {
-        this.transactions.add(BANK_NOTE_TYPE * (new Random().nextInt(VALUES) + VALUES));
+        this.transactions.add((long) BANK_NOTE_TYPE * (new Random().nextInt(VALUES) + VALUES));
     }
 
     @Override
@@ -29,7 +29,9 @@ public class Market implements Callable<String> {
 
         System.out.println("Calculating of market " + Thread.currentThread().getName() + " finished.");
 
-        taxBase.addTaxBase(Thread.currentThread().getName(), transactions);
+        for (Long transaction : transactions) {
+            taxBase.addTaxBase(Thread.currentThread().getName(), transaction);
+        }
 
         return Thread.currentThread().getName();
     }
